@@ -37,7 +37,7 @@ class CommunityReportsCompileCommand extends Command
      */
     protected function getJasperStarter()
     {
-        return base_path('vendor/cossou/jasperphp/src/JasperStarter/bin/jasperstarter');
+        return base_path('vendor/geekcom/phpjasper/bin/jasperstarter/bin/jasperstarter');
     }
 
     /**
@@ -59,6 +59,15 @@ class CommunityReportsCompileCommand extends Command
 
         $jasperStarter = $this->getJasperStarter();
 
-        passthru('cd ' . $jasperFiles . '; for line in $(ls -a | sort | grep .jrxml | sed -e "s/\.jrxml//"); do $(' . $jasperStarter . ' cp $line.jrxml -o $line) && echo "  $line"; done');
+        if (! is_file($jasperStarter)) {
+            $this->error('JasperStarter não encontrado. Instale geekcom/phpjasper no i-Educar (composer).');
+
+            return 1;
+        }
+
+        passthru(
+            'cd '.escapeshellarg($jasperFiles).'; for line in $(ls -a | sort | grep .jrxml | sed -e "s/\\.jrxml//"); do '
+            .escapeshellarg($jasperStarter).' cp "$line.jrxml" -o "$line" && echo "  $line"; done'
+        );
     }
 }
